@@ -1,0 +1,74 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '2.7.14'
+	id 'io.spring.dependency-management' version '1.1.6'
+	id "org.openapi.generator" version "7.8.0"
+}
+
+group = 'au.id.wattle.chapman.camel.demo'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(8)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+sourceSets {
+   main {
+      java {
+         srcDir "${buildDir}/generated/src/main/java"
+      }
+   }
+}
+
+openApiGenerate {
+    generatorName.set("spring")
+    inputSpec.set("$rootDir/src/main/resources/swagger.yml")
+    outputDir.set("$buildDir/generated")
+    apiPackage.set("au.id.wattle.chapman.camel.demo.apis")
+    modelPackage.set("au.id.wattle.chapman.camel.demo.models")
+    configOptions.put("dateLibrary", "java8")
+    configOptions.put("delegatePattern", "true")
+    configOptions.put("openApiNullable", "false")
+    configOptions.put("useBeanValidation", "false")
+    configOptions.put("documentationProvider", "none")
+    configOptions.put("basePackage", "au.id.wattle.chapman.camel.demo")
+    configOptions.put("configPackage", "au.id.wattle.chapman.camel.demo.configuration")
+	
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'org.apache.camel.springboot:camel-servlet-starter:3.14.10'
+	implementation 'org.apache.camel.springboot:camel-jackson-starter:3.14.10'
+	implementation 'org.apache.camel.springboot:camel-spring-boot-starter:3.14.10'
+	implementation 'org.mapstruct:mapstruct:1.6.0'
+	implementation 'javax.annotation:javax.annotation-api:1.3.2'
+	implementation 'com.google.code.findbugs:jsr305:3.0.2'
+	compileOnly 'org.projectlombok:lombok'
+	compileOnly 'org.mapstruct:mapstruct-processor:1.6.0'
+	annotationProcessor 'org.projectlombok:lombok'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.0'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+tasks.named("compileJava").configure {
+    dependsOn("openApiGenerate")
+}

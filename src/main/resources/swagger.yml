@@ -1,0 +1,94 @@
+openapi: 3.0.1
+info:
+  title: API Title
+  version: "1.0"
+servers:
+- url: https://api.server.test/
+paths:
+  /savings/calculation:
+    get:
+      summary: Calculate the amount saved with compound interest
+      operationId: calculateSavings
+      parameters:
+      - name: rate
+        in: query
+        schema:
+          minimum: 0
+          type: number
+          default: 0.0
+      - name: savings
+        in: query
+        schema:
+          minimum: 0
+          type: number
+          default: 0.0
+      - name: frequency
+        in: query
+        schema:
+          type: string
+          default: monthly
+          enum:
+          - weekly
+          - fortnightly
+          - monthly
+      - name: interestFrequency
+        in: query
+        schema:
+          type: string
+          default: monthly
+          enum:
+          - weekly
+          - fortnightly
+          - monthly
+      - name: initialAmount
+        in: query
+        schema:
+          minimum: 0
+          type: number
+          default: 0.0
+      - name: term
+        in: query
+        schema:
+          minimum: 0
+          type: integer
+          default: 0
+      - name: calculationType
+        in: query
+        schema:
+          type: string
+          default: simple
+          enum:
+          - simple
+          - complex
+      responses:
+        "200":
+          description: The amount saved
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SavingsResponse'
+components:
+  schemas:
+    SavingsResponse:
+      type: object
+      properties:
+        totalAmount:
+          type: string
+        totalInterest:
+          type: string
+        amortization:
+          type: array
+          items:
+            $ref: '#/components/schemas/SavingsResponseAmortization'
+    SavingsResponseAmortization:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        amount:
+          type: string
+        type:
+          type: string
+        balance:
+          type: string
